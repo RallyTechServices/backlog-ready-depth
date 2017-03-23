@@ -116,12 +116,7 @@ Ext.define("backlog-ready-depth", {
         config.__At = Rally.util.DateTime.toIsoString(atDate);
         config._ProjectHierarchy = this.getContext().getProject().ObjectID;
 
-
-
-
         this.logger.log('fetchIterationBoundarySnapshots', config, iterationInfo);
-
-
 
         return RallyTechServices.backlogreadydepth.utils.Toolbox.fetchLookbackSnapshots({
             findConfig: config,
@@ -168,8 +163,11 @@ Ext.define("backlog-ready-depth", {
 
 
         var prop = "ObjectID",
-            filters = [],
-            projectId = this.getContext().getProject().ObjectID;
+            projectId = this.getContext().getProject().ObjectID,
+            filters = [{
+                property: 'ObjectID',
+                value: projectId
+            }];
         for (var i = 2; i < 9; i++){
             prop = "Parent." + prop;
             filters.push({
@@ -330,8 +328,6 @@ Ext.define("backlog-ready-depth", {
         });
         menu.showBy(btn.getEl());
 
-
-
     },
     buildChart: function(data){
         this.logger.log('processData', data);
@@ -344,8 +340,7 @@ Ext.define("backlog-ready-depth", {
         });
 
         var velocityData = data.slice(-1)[0],
-            numSprintsForAverageVelocity = this.getNumSprintsForAverageVelocity(),
-            backlogMaxIndex = this.iterationData.length - numSprintsForAverageVelocity;
+            numSprintsForAverageVelocity = this.getNumSprintsForAverageVelocity();
 
         for (var i=0; i<this.iterationData.length; i++){
             this.iterationData[i].calculateVelocity(velocityData);
@@ -375,10 +370,17 @@ Ext.define("backlog-ready-depth", {
         }, this);
 
 
-        var maxY = this.getMaxSprintsOnGraph();
+        var maxY = this.getMaxSprintsOnGraph(),
+            height = this.getHeight(),
+            buttonHeight  = this.down('#export_box').getHeight(),
+            maxHeight = Math.max(height-buttonHeight, 100),
+            chartHeight = maxHeight * .80;
+        this.logger.log('buildChart heights', height, buttonHeight, maxHeight);
+
         this.down('#grid_box').add({
             xtype: 'rallychart',
             chartColors: this.chartColors,
+            height: chartHeight,
             chartConfig: {
                 chart: {
                     events: {
