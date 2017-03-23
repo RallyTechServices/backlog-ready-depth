@@ -1,11 +1,31 @@
-#Backlog Ready Depth
+# Backlog Ready Depth
 
 ## Summary/Description
 
 ![screenshot](./images/screenshot.png "This is an example")
 
-##Assumptions
+## Assumptions
 *  All projects in current scope (including currently selected project) have the same sprint/iteration cadence and sprint/iteration objects defined at all levels 
+*  Assumes that iterations with the same name have the same start and end dates.  
+
+
+## App Settings
+
++ # Sprints to Trend - Number of sprints to show backlog depth for.  There will be one series for each sprint.  
++ # Sprints for Avg Velocity - Number of sprints to use to calculate average sprint velocity. If 3 is selected, then the previous 3 sprints' velocity will be used to calculate average sprint velocity.  
++ Max Sprints On Graph - Maximum number of sprints to show on the bottom axis of the graph.  Set to 0 for the graph to be auto-scaled according to returned data.  
++ Include Defects - Check to include defects in the backlog depth calculations
++ Filter Field - Field to use to filter values by.  If not selected, all work items in the scope will be included.  
++ Filter Value - Values to include in the datasets for backlog depth calculations.  Ignored if no filter field is selected.    
++ Include Project Field - If selected, projects will only be displayed on the chart if this custom (boolean) project field is set to true.  If this field is not defined, then all leaf projects in the current scope will be included on the chart.  
+
+#### Color Threshold Settings for Graph
++ Inner Threshold
++ Inner Color
++ Outer Threshold
++ Outer Color
++ Outside Color
+
 
 
 ## Development Notes
