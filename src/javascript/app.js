@@ -52,7 +52,7 @@ Ext.define("backlog-ready-depth", {
         "Ready": true,
         "Blocked": false
     },
-    lookbackBacklogFetch: ['Project','Iteration','ObjectID',"_ProjectHierarchy","PlanEstimate"],
+    lookbackBacklogFetch: ['Project','Iteration','ObjectID',"_ProjectHierarchy","PlanEstimate","FormattedID"],
 
     velocityFetch: ['Project','ObjectID','Iteration','PlanEstimate'],
 
@@ -295,8 +295,43 @@ Ext.define("backlog-ready-depth", {
         }
         return x;
     },
-    export: function(){
-        this.logger.log('export');
+    exportData: function(btn, calculator){
+        this.logger.log('export', calculator);
+
+        var menu = Ext.widget({
+            xtype: 'rallymenu',
+            items: [
+                {
+                    text: 'Export Backlog Depth Summary...',
+                    handler: function() {
+                        var csv = calculator.getSummaryExportCSV(),
+                            fileName = Ext.String.format('summary-{0}.csv', Rally.util.DateTime.format(new Date(), 'Y-m-d-h-i-s'));
+                        RallyTechServices.backlogreadydepth.utils.Toolbox.saveCSVToFile(csv,fileName);
+                    },
+                    scope: this
+                }, {
+                    text: 'Export Velocity Summary...',
+                    handler: function() {
+                        var csv = calculator.getVelocityExportCSV(),
+                            fileName = Ext.String.format('velocity-{0}.csv', Rally.util.DateTime.format(new Date(), 'Y-m-d-h-i-s'));
+                        RallyTechServices.backlogreadydepth.utils.Toolbox.saveCSVToFile(csv,fileName);
+                    },
+                    scope: this
+                },{
+                    text: "Export Backlog Details...",
+                    handler: function(){
+                        var csv = calculator.getDetailedExportCSV(),
+                            fileName = Ext.String.format('details-{0}.csv', Rally.util.DateTime.format(new Date(), 'Y-m-d-h-i-s'));
+                        RallyTechServices.backlogreadydepth.utils.Toolbox.saveCSVToFile(csv,fileName);
+                    },
+                    scope: this
+                }
+            ]
+        });
+        menu.showBy(btn.getEl());
+
+
+
     },
     buildChart: function(data){
         this.logger.log('processData', data);
@@ -336,9 +371,7 @@ Ext.define("backlog-ready-depth", {
             cls: 'secondary rly-small'
         });
         btn.on('click', function(){
-            var csv = calc.getSummaryExportCSV(),
-                fileName = Ext.String.format('summary-{0}.csv', Rally.util.DateTime.format(new Date(), 'Y-m-d-h-i-s'));
-            RallyTechServices.backlogreadydepth.utils.Toolbox.saveCSVToFile(csv,fileName);
+            this.exportData(btn, calc);
         }, this);
 
 
@@ -348,7 +381,29 @@ Ext.define("backlog-ready-depth", {
             chartColors: this.chartColors,
             chartConfig: {
                 chart: {
+                    events: {
+                        load: function() {
+                            var chart = this;
 
+                            if (chart){
+                                Ext.Array.each(chart.series, function(s){
+                                    for (var i=0; i< s.yData.length; i++){
+                                        if (s.yData[i] > maxY){
+
+                                            chart.renderer.label('<div class="icon-warning"></div>' + s.yData[i], chart.plotSizeY + chart.plotLeft - 50, s.data[i].plotX + chart.plotTop + 15 ,undefined,undefined,undefined,true)
+                                                .css({
+                                                    fontSize: '12px',
+                                                    fontFamily: 'ProximaNova',
+                                                    backgroundColor: '#444',
+                                                    color: '#444' //s.color //'#FAD200',
+                                                })
+                                                .add();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    },
                     type: 'bar',
                     plotBackgroundColor: this.getSetting('outsideColor'),
                     zoomType: 'y'
@@ -448,13 +503,7 @@ Ext.define("backlog-ready-depth", {
                     borderWidth: 0
                 }
             },
-            chartData: calc.getChartData(),
-            listeners: {
-                render: function(chart){
-                    console.log('chart',chart);
-
-                }
-            }
+            chartData: calc.getChartData()
         });
 
     },
@@ -501,6 +550,7 @@ Ext.define("backlog-ready-depth", {
             labelWidth: 250
         },
             filterValues =  this.getFilterFieldValues();
+        this.logger.log('getSettingsFields', filterValues);
 
         var numSprintsToTrend =  Ext.Object.merge({
             xtype: 'rallynumberfield',
