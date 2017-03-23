@@ -32,34 +32,19 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.BacklogDepthCalculator',{
     },
     _calculateBacklogDepth: function(project, iterationDataIndex){
         var projectId = project.get('ObjectID');
-        //    futureIterations = Ext.Array.clone(this.futureIterations); //this and all iterations after is ok.
-        //
-        //for (var i = iterationDataIndex; i<this.iterationData.length; i++){
-        //    if (!this.iterationData[i]._iterationOids){
-        //        this.iterationData[i]._iterationOids = Ext.Array.map(this.iterationData[i]._iterations, function(i){ return i.ObjectID });
-        //    }
-        //    futureIterations = futureIterations.concat(this.iterationData[i]._iterationOids);
-        //}
-        ////for the project and its children, we need to make sure the iteration isn't in the past.
+
         var iterationData = this.iterationData[iterationDataIndex];
 
-        //for (var i=0; i<snaps.length; i++){
-        //    var snap = snaps[i].getData();
-        //
-        //    if (Ext.Array.contains(snap._ProjectHierarchy, projectId) && (!snap.Iteration || Ext.Array.contains(futureIterations, snap.Iteration))){
-        //        totalPoints += snap.PlanEstimate || 0;
-        //        projects.push(snap.Project);
-        //    }
-        //}
-
         var velocities = [];
-        for (var i=iterationDataIndex-1; i > 0; i--){
-            velocities.push(this.iterationData[i].getVelocity(projectId));
+        for (var i=1; i <= this.numSprintsForAverageVelocity; i++){
+            var idx = iterationDataIndex - i;
+            velocities.push(this.iterationData[idx].getVelocity(projectId));
         }
 
         var avgVelocity = Ext.Array.mean(velocities),
             totalPoints = iterationData.getTotalPlanEstimate(projectId);
 
+       // console.log('_calculateBacklogDepth', project.get('Name'), iterationData.Name, totalPoints, avgVelocity, velocities);
         if (avgVelocity > 0){
             var x = Math.round(totalPoints/avgVelocity * 100);
             return x/100;
@@ -67,40 +52,6 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.BacklogDepthCalculator',{
 
         return 0;
     },
-    //_aggregateBacklogSnaps: function(backlogData, iterationData){
-    //    var backlogMaxIndex = iterationData.length - this.numSprintsForAverageVelocity;
-    //    for (var i=0; i<backlogMaxIndex; i++){
-    //        iterationData[i + this.numSprintsForAverageVelocity]._snaps = backlogData[i];
-    //    }
-    //
-    //},
-    /**
-     * calculate the velocity
-     * @param velocityData
-     * @param iterationData
-     * @private
-     */
-    //_calculateVelocity: function(velocityData, iterationData){
-    //    var velocity = {};
-    //    Ext.Array.each(velocityData, function(r){
-    //        var iteration = r.get('Iteration').ObjectID.toString();
-    //        if (!velocity[iteration]){
-    //            velocity[iteration] = 0;
-    //        }
-    //        velocity[iteration] += r.get('PlanEstimate') || 0;
-    //    });
-    //
-    //    Ext.Array.each(iterationData, function(id){
-    //        var projectVelocities = {};
-    //        Ext.Array.each(id._iterations, function(i){
-    //            var key = i.ObjectID,
-    //                projectKey = i.Project.ObjectID;
-    //
-    //            projectVelocities[projectKey] = velocity[key] || null;
-    //        });
-    //        id._projectVelocity = projectVelocities;
-    //    });
-    //},
     getCategories: function(){
         return Ext.Array.map(this.projects, function(p){
             return p.get('Name');
@@ -121,18 +72,6 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.BacklogDepthCalculator',{
             color: settings.outerColor
         }];
     },
-    getOverflowLabels: function(maxSprints, chart){
-        if (maxSprints > 0){
-            var labels = [];
-
-
-
-
-            return labels;
-        }
-        return null;
-
-    },
     getSummaryExportCSV: function(){
 
         var headers = ["Team"],
@@ -151,5 +90,44 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.BacklogDepthCalculator',{
         }
         return csv.join('\r\n');
 
+    },
+    getVelocityExportCSV: function(){
+        var headers = ["Team"],
+            csv = [];
+        for (var i=0; i<this.iterationData.length; i++){
+            headers.push(this.iterationData[i].Name);
+        }
+        csv.push(headers.join(','));
+
+        for (var c=0; c<this.projects.length; c++){
+            var row = [this.projects[c].get('Name')];
+            for (var i=0; i<this.iterationData.length; i++){
+                row.push(this.iterationData[i].getVelocity(this.projects[c].get('ObjectID')));
+            }
+            csv.push(row.join(','));
+        }
+        return csv.join('\r\n');
+    },
+    getDetailedExportCSV: function(){
+        //var headers = ["Team","Team ObjectID","Iteration Name","FormattedID","PlanEstimate"],  //Includes ugly project ObjectID
+        var headers = ["Team","Iteration Name","FormattedID","PlanEstimate"],
+            csv = [];
+        csv.push(headers.join(','));
+
+        for (var c=0; c<this.projects.length; c++){
+            var team = this.projects[c].get('Name'),
+                teamId = this.projects[c].get('ObjectID');
+
+            for (var i=this.numSprintsForAverageVelocity; i<this.iterationData.length; i++){
+                var iterationName = this.iterationData[i].Name,
+                    snaps = this.iterationData[i].getSnapsForProject(teamId);
+                for (var j=0; j<snaps.length; j++){
+                   // var row = [team, teamId, iterationName, snaps[j].FormattedID, snaps[j].PlanEstimate];  //Includes ugly project ObjectID
+                    var row = [team, iterationName, snaps[j].FormattedID, snaps[j].PlanEstimate];
+                    csv.push(row.join(','));
+                }
+            }
+        }
+        return csv.join('\r\n');
     }
 });

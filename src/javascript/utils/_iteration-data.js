@@ -29,7 +29,7 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.IterationData',{
     },
     addSnaps: function(snapshots){
 
-        this._snaps = [];
+        this._snaps = {};
         var projectTotalPlanEst = {};
 
         for (var i=0; i< snapshots.length; i++){
@@ -40,8 +40,11 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.IterationData',{
                     projectTotalPlanEst[project] = 0;
                 }
                 projectTotalPlanEst[project] += snap.PlanEstimate || 0;
+                if (!this._snaps[project]){
+                    this._snaps[project] = [];
+                }
+                this._snaps[project].push(snap);
             }
-            this._snaps.push(snap);
         }
         this._projectTotalPlanEstimates = projectTotalPlanEst;
         this._logger.log('addSnaps', this.Name, this._snaps, this._projectTotalPlanEstimates);
@@ -61,8 +64,6 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.IterationData',{
                 futureIterations.push(iterations[j].get('ObjectID'));
             } else if (iterations[j].get('Name') === thisName){
                 this.addIteration(iterations[j].getData());
-                //it._iterations.push(iterations[j].getData());
-                //iterations.splice(j,1);
             }
         }
         this._futureIterations = futureIterations;
@@ -91,5 +92,8 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.IterationData',{
     },
     getTotalPlanEstimate: function(projectObjectID){
         return this._projectTotalPlanEstimates && this._projectTotalPlanEstimates[projectObjectID] || 0;
+    },
+    getSnapsForProject: function(projectObjectID){
+        return this._snaps && this._snaps[projectObjectID] || [];
     }
 });

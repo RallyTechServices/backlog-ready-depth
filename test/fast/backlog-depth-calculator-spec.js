@@ -9,11 +9,7 @@ describe("Given the iteration data, snapshots and velocity data, the Backlog Dep
     var calc = Ext.create('RallyTechServices.backlogreadydepth.utils.BacklogDepthCalculator',{
         iterationData: iterationData,
         projects: projects,
-        velocityData: velocityData,
-        backlogData: backlogData,
-        numSprintsForAverageVelocity: 3,
-        numSprintsToTrend: 4,
-        futureIterations: futureIterations
+        numSprintsForAverageVelocity: 3
     });
     it("should calculate average velocity for the past N sprints",function(){
         expect(true).toBe(true);

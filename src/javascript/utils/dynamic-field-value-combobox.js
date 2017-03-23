@@ -13,16 +13,12 @@ Ext.define('RallyTechServices.ui.combobox.DynamicFieldValueCombobox',{
             return;
         }
         this.setDisabled(false);
+
+        this.store.on('load', function(){ this.fireEvent('ready', this); }, this);
         this._loadStoreValues();
     },
     refreshWithNewField: function(fieldName){
         this.field = this.model.getField(fieldName);
         this._populateStore();
-    },
-    setValue: function(value) {
-        if (Ext.isString(value)){
-            value = value.split(',');
-        }
-        this.callParent(value);
     }
 });
