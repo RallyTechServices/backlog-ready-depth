@@ -27,7 +27,7 @@ Ext.define("backlog-ready-depth", {
             maxSprintsOnGraph: 0,
             filterField: null,
             filterValues: null,
-            includeProjectField: null
+            excludeProjectField: null
         }
     },
     chartColors: [
@@ -188,9 +188,10 @@ Ext.define("backlog-ready-depth", {
             value: "Open"
         });
 
-        if (this.getProjectIncludeField()){
+        if (this.getProjectExcludeField()){
             filters= filters.and({
-                property: this.getProjectIncludeField(),
+                property: this.getProjectExcludeField(),
+                operator: '!=',
                 value: true
             });
         }
@@ -525,8 +526,8 @@ Ext.define("backlog-ready-depth", {
     getRelativeProjectDepth: function(){
         return this.getSetting('relativeProjectDepth') || 2;
     },
-    getProjectIncludeField: function(){
-        return this.getSetting('includeProjectField') || null;
+    getProjectExcludeField: function(){
+        return this.getSetting('excludeProjectField') || null;
     },
     getFilterField: function(){
         return this.getSetting('filterField') || null;
@@ -571,8 +572,8 @@ Ext.define("backlog-ready-depth", {
 
         var includeProjectsField = Ext.Object.merge({
             xtype: 'booleanfieldcombobox',
-            fieldLabel: 'Include Project Field',
-            name: 'includeProjectField',
+            fieldLabel: 'Exclude Project Field',
+            name: 'excludeProjectField',
             allowNoEntry: true,
             model: 'Project'
         }, defaults);
