@@ -33,7 +33,7 @@ The *Velocity* is the CURRENT total Plan Estimate for work items.  Note that if 
 
 + Number Sprints to Trend - Number of sprints to show backlog depth for.  There will be one series for each sprint.  
 + Include Defects - if checked, defects will be included in the backlog depth calculation.  Note that if a Filter field is selected and that filter field is not on the defect object, then no defects will be included, despite this setting.
-+ Include Project Field - If selected, projects will only be displayed on the chart if this custom (boolean) project field is set to true.  If this field is not defined, then all leaf projects in the current scope will be included on the chart.  
++ Exclude Project Field - If selected, projects will only be displayed on the chart if this custom (boolean) project field is NOT true.  If this field is not defined, then all leaf projects in the current scope will be included on the chart.  
 + Filter Field - Field to use to filter values by.  If not selected, all work items in the scope will be included.  
 + Filter Value - Values to include in the datasets for backlog depth calculations.  Ignored if no filter field is selected.  Also ignored if no values are selected.    
 + Max number Sprints Visible - Maximum number of sprints to show on the bottom axis of the graph.  Set to 0 for the graph to be auto-scaled according to returned data. If this number is set and any point goes over, you will see a visual indicator on the right side of the plot area.
