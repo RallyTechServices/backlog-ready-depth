@@ -33,8 +33,12 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.IterationData',{
         var projectTotalPlanEst = {};
 
         for (var i=0; i< snapshots.length; i++){
+
             var snap = snapshots[i].getData(),
                 project = snap.Project;
+
+            console.log('snap', snap.FormattedID, snap);
+            
             if (!snap.Iteration || this._isFutureIteration(snap.Iteration)){
                 if (!projectTotalPlanEst[project]){
                     projectTotalPlanEst[project] = 0;
@@ -44,7 +48,10 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.IterationData',{
                     this._snaps[project] = [];
                 }
                 this._snaps[project].push(snap);
+            } else {
+              console.log('snap not used', snap.FormattedID, snap, snap.Iteration);
             }
+
         }
         this._projectTotalPlanEstimates = projectTotalPlanEst;
         this._logger.log('addSnaps', this.Name, this._snaps, this._projectTotalPlanEstimates);
