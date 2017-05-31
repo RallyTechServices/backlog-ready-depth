@@ -27,7 +27,8 @@ Ext.define("backlog-ready-depth", {
             maxSprintsOnGraph: 0,
             filterField: null,
             filterValues: null,
-            excludeProjectField: null
+            excludeProjectField: null,
+            offsetHours: 0
         }
     },
     chartColors: [
@@ -99,15 +100,19 @@ Ext.define("backlog-ready-depth", {
 
         return Deft.Promise.all(promises);
     },
+    getOffsetHours: function(){
+      return this.getSetting('offsetHours') || 0;
+    },
     fetchIterationBoundarySnapshots: function(iterationInfo){
 
-        var offsetDays = 0,
-            atDate = Rally.util.DateTime.add(iterationInfo.StartDate, "day", offsetDays);
+        var offsetHours = this.getOffsetHours(),
+            atDate = Rally.util.DateTime.add(iterationInfo.StartDate, "hour", offsetHours);
 
         var config = Ext.clone(this.lookbackBacklogFilter);
 
         var filterField = this.getFilterField(),
             filterFieldValues = this.getFilterFieldValues();
+
         this.logger.log('fetchIterationBoundarySnapshots: filterField', filterField, filterFieldValues);
         if (filterField && filterFieldValues){
             config[filterField] = {$in: filterFieldValues}
@@ -122,7 +127,6 @@ Ext.define("backlog-ready-depth", {
             findConfig: config,
             fetch: this.lookbackBacklogFetch
         });
-
     },
     /**
      * fetchs all current accepted work items associated with all iterations so that we can calculate velocity
@@ -339,7 +343,6 @@ Ext.define("backlog-ready-depth", {
             xtype: 'container',
             flex: 1
         });
-
         var velocityData = data.slice(-1)[0],
             numSprintsForAverageVelocity = this.getNumSprintsForAverageVelocity();
 
@@ -681,6 +684,14 @@ Ext.define("backlog-ready-depth", {
             }
         }, defaults);
 
+        var offsetHours = Ext.Object.merge({
+            xtype: 'rallynumberfield',
+            name: 'offsetHours',
+            fieldLabel: 'Offset Hours',
+            minValue: -24,
+            maxValue: 24
+        }, defaults);
+
         return [
             numSprintsToTrend,
             includeDefects,
@@ -691,7 +702,8 @@ Ext.define("backlog-ready-depth", {
             innerThresholdStart,
             innerThresholdEnd,
             outerThresholdStart,
-            outerThresholdEnd
+            outerThresholdEnd,
+            offsetHours
         ];
     },
 
@@ -704,14 +716,14 @@ Ext.define("backlog-ready-depth", {
             }
         ];
     },
-    
+
     _launchInfo: function() {
         if ( this.about_dialog ) { this.about_dialog.destroy(); }
         this.about_dialog = Ext.create('Rally.technicalservices.InfoLink',{});
     },
-    
+
     isExternal: function(){
         return typeof(this.getAppId()) == 'undefined';
     }
-    
+
 });

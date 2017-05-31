@@ -13,20 +13,20 @@ Backlog Ready Depth is defined as (for each sprint):
 The *Total Plan Estimate in Backlog* is calculated as follows:
 *  A snapshot in time is taken at the Start Date and Time of the sprint that the backlog depth is calculated for to find all user stories (and defects if selected in the settings) that meet the following criteria:
 +  ScheduleState = Defined
-+  Blocked = false 
++  Blocked = false
 +  Ready = true
 +  PlanEstimate > 0
 +  If a Filter Field is configured in the App Setings, then only stories that have the configured values for the Filter Field will be included in the total plan estimate sum
 
 The *Velocity* is the CURRENT total Plan Estimate for work items.  Note that if a story was accepted after the sprint end date boundary, and is still associated with the sprint, it will be included in the current velocity.  Note that calculation of velocity is for all items in the iteration and is NOT filtered, even if a Filter Field is selected in the App Settings.     
 
-## Exports 
+## Exports
 *  Backlog Depth Summary - simple summary of the Backlog Ready Depth calculations that make up the chart (Team, Sprint and Backlog Depth Calculation)
 *  Velocity Summary - for each team represented, and each of the sprints (including the 3 used in historical velocity calculations and not included on the chart), summary of the current velocity calculated for the team and iteration
-*  Backlog Details - for each Team and Iteration, the formatted ids and plan estimate of each work item that made up the backlog used in the *total plan estimate in backlog* calculation above. 
+*  Backlog Details - for each Team and Iteration, the formatted ids and plan estimate of each work item that made up the backlog used in the *total plan estimate in backlog* calculation above.
 
 ## Assumptions
-*  All projects in current scope (including currently selected project) have the same sprint/iteration cadence and sprint/iteration objects defined at all levels 
+*  All projects in current scope (including currently selected project) have the same sprint/iteration cadence and sprint/iteration objects defined at all levels
 *  Assumes that iterations with the same name have the same start and end dates.  
 
 ## App Settings
@@ -41,6 +41,7 @@ The *Velocity* is the CURRENT total Plan Estimate for work items.  Note that if 
 + Inner Threshold End - the end (in Sprints) of the inner (light green) threshold on the chart
 + Outer Threshold Start - the beginning (in Sprints) of the outer (light yellow) threshold on the chart
 + Outer Threshold End - the end (in Sprints) of the outer (light yellow) threshold on the chart
++ Offset Hours - the hours to offset the snapshot for the beginning of the sprint to calculate backlog depth for.  Positive numbers take the snapshot after the next sprint has begun and negative numbers take the snapshot before the sprints end.  The default is 0.  
 
 ![screenshot](./images/backlog-ready-depth-settings.png)
 
@@ -58,13 +59,13 @@ The *Velocity* is the CURRENT total Plan Estimate for work items.  Note that if 
 
 ### First Load
 
-If you've just downloaded this from github and you want to do development, 
+If you've just downloaded this from github and you want to do development,
 you're going to need to have these installed:
 
  * node.js
  * grunt-cli
  * grunt-init
- 
+
 Since you're getting this from github, we assume you have the command line
 version of git also installed.  If not, go get git.
 
@@ -75,15 +76,15 @@ to get set up to develop:
 
 ### Structure
 
-  * src/javascript:  All the JS files saved here will be compiled into the 
+  * src/javascript:  All the JS files saved here will be compiled into the
   target html file
-  * src/style: All of the stylesheets saved here will be compiled into the 
+  * src/style: All of the stylesheets saved here will be compiled into the
   target html file
-  * test/fast: Fast jasmine tests go here.  There should also be a helper 
+  * test/fast: Fast jasmine tests go here.  There should also be a helper
   file that is loaded first for creating mocks and doing other shortcuts
   (fastHelper.js) **Tests should be in a file named <something>-spec.js**
   * test/slow: Slow jasmine tests go here.  There should also be a helper
-  file that is loaded first for creating mocks and doing other shortcuts 
+  file that is loaded first for creating mocks and doing other shortcuts
   (slowHelper.js) **Tests should be in a file named <something>-spec.js**
   * templates: This is where templates that are used to create the production
   and debug html files live.  The advantage of using these templates is that
@@ -99,10 +100,10 @@ to get set up to develop:
         "password":"secret",
         "server": "https://rally1.rallydev.com"
     }
-  
+
 ### Usage of the grunt file
 ####Tasks
-    
+
 ##### grunt debug
 
 Use grunt debug to create the debug html file.  You only need to run this when you have added new files to
@@ -114,7 +115,7 @@ Use grunt build to create the production html file.  We still have to copy the h
 
 ##### grunt test-fast
 
-Use grunt test-fast to run the Jasmine tests in the fast directory.  Typically, the tests in the fast 
+Use grunt test-fast to run the Jasmine tests in the fast directory.  Typically, the tests in the fast
 directory are more pure unit tests and do not need to connect to Rally.
 
 ##### grunt test-slow
@@ -152,4 +153,3 @@ pageOid and panelOid lines to install in a new place.  CAUTION:  Currently, erro
 ##### grunt watch
 
 Run this to watch files (js and css).  When a file is saved, the task will automatically build and deploy as shown in the deploy section above.
-
