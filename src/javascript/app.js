@@ -115,6 +115,7 @@ Ext.define("backlog-ready-depth", {
 
         this.logger.log('fetchIterationBoundarySnapshots: filterField', filterField, filterFieldValues);
         if (filterField && filterFieldValues){
+
             config[filterField] = {$in: filterFieldValues}
         }
 
@@ -215,6 +216,7 @@ Ext.define("backlog-ready-depth", {
      * @returns {*}
      */
     fetchIterationInfo: function(){
+        this.logger.log('fetchIterationInfo', Rally.util.DateTime.toUtcIsoString(new Date()));
         return RallyTechServices.backlogreadydepth.utils.Toolbox.fetchWsapiRecords({
             model: 'Iteration',
             fetch: ['Name','StartDate','EndDate'],
@@ -227,8 +229,8 @@ Ext.define("backlog-ready-depth", {
             },
             filters: [{
                 property: 'StartDate',
-                operator: '<',
-                value: Rally.util.DateTime.toIsoString(new Date())
+                operator: '<=',
+                value: Rally.util.DateTime.toUtcIsoString(new Date())
             }],
             sorters: [{
                 property: 'StartDate',
@@ -257,9 +259,9 @@ Ext.define("backlog-ready-depth", {
         },this,true);  //reverse = "true" we will put the iterations in ascending order for easier access
         this.iterationData = iterationData;
 
-        this.logger.log('fetchAllIterations', iterationData);
         //todo we need to deal with timezone?
         var iterationStartDate = iterationData[0].StartDate;  //Rally.util.DateTime.toIsoString(iterationInfoRecords.slice(-1)[0].get('StartDate'));
+        this.logger.log('fetchAllIterations', iterationData, iterationStartDate);
 
         //Now we want to get all the iterations that we are using for calculating velocity and backlog depth.
         return RallyTechServices.backlogreadydepth.utils.Toolbox.fetchWsapiRecords({
