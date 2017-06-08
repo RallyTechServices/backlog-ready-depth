@@ -33,9 +33,9 @@ Ext.define('RallyTechServices.backlogreadydepth.utils.Toolbox',{
         var deferred = Ext.create('Deft.Deferred');
 
         config.removeUnauthorizedSnapshots = true;
-        if (!config.limit){
-            config.limit = Infinity;
-        }
+        //if (!config.limit){
+            config.limit = "Infinity";
+        //}
 
         Ext.create('Rally.data.lookback.SnapshotStore', config).load({
             callback: function(records, operation){
